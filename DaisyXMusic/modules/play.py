@@ -1197,6 +1197,7 @@ async def jiosaavn(client: Client, message_: Message):
     )
     os.remove("final.png")
     await asyncio.sleep(int(time_to_seconds(sduration)))
+    await m.delete()
 
 @Client.on_callback_query(filters.regex(pattern=r"plll"))
 async def lol_cb(b, cb):
