@@ -24,6 +24,7 @@ import aiofiles
 import aiohttp
 import ffmpeg
 import requests
+import asyncio
 import wget
 from PIL import Image
 from PIL import ImageDraw
@@ -879,13 +880,15 @@ async def ytplay(_, message: Message):
         loc = file_path
         appendable = [s_name, r_by, loc]
         qeue.append(appendable)
-        await message.reply_photo(
+        m = await message.reply_photo(
             photo="final.png",
             caption=f"#⃣ Your requested song <b>queued</b> at position {position}!",
             reply_markup=keyboard,
         )
         os.remove("final.png")
         return await lel.delete()
+        await asyncio.sleep(int(time_to_seconds(duration)))
+        await m.delete()
     else:
         chat_id = get_chat_id(message.chat)
         que[chat_id] = []
@@ -900,7 +903,7 @@ async def ytplay(_, message: Message):
         except:
             message.reply("Group Call is not connected or I can't join it")
             return
-        await message.reply_photo(
+        m = await message.reply_photo(
             photo="final.png",
             reply_markup=keyboard,
             caption="▶️ <b>Playing</b> here the song requested by {} via Youtube Music 😎".format(
@@ -909,7 +912,9 @@ async def ytplay(_, message: Message):
         )
         os.remove("final.png")
         return await lel.delete()
-    
+        await asyncio.sleep(int(time_to_seconds(duration)))
+        await m.delete()
+
 @Client.on_message(filters.command("dplay") & filters.group & ~filters.edited)
 async def deezer(client: Client, message_: Message):
     if message_.chat.id in DISABLED_GROUPS:
@@ -1046,7 +1051,8 @@ async def deezer(client: Client, message_: Message):
         caption=f"Playing [{title}]({url}) Via Deezer",
     )
     os.remove("final.png")
-
+    await asyncio.sleep(int(time_to_seconds(duration)))
+    await m.delete()
 
 @Client.on_message(filters.command("splay") & filters.group & ~filters.edited)
 async def jiosaavn(client: Client, message_: Message):
@@ -1164,7 +1170,8 @@ async def jiosaavn(client: Client, message_: Message):
             photo="final.png",
             caption=f"✯{bn}✯=#️⃣ Queued at position {position}",
         )
-
+        await asyncio.sleep(int(time_to_seconds(sduration)))
+        await m.delete()
     else:
         await res.edit_text(f"{bn}=▶️ Playing.....")
         que[chat_id] = []
@@ -1189,7 +1196,7 @@ async def jiosaavn(client: Client, message_: Message):
         caption=f"Playing {sname} Via Jiosaavn",
     )
     os.remove("final.png")
-
+    await asyncio.sleep(int(time_to_seconds(sduration)))
 
 @Client.on_callback_query(filters.regex(pattern=r"plll"))
 async def lol_cb(b, cb):
@@ -1270,13 +1277,14 @@ async def lol_cb(b, cb):
         appendable = [s_name, r_by, loc]
         qeue.append(appendable)
         await cb.message.delete()
-        await b.send_photo(chat_id,
-            photo="final.png",
-            caption=f"#⃣  Song requested by {r_by.mention} <b>queued</b> at position {position}!",
-            reply_markup=keyboard,
+        card = await b.send_photo(chat_id,
+               photo="final.png",
+               caption=f"#⃣  Song requested by {r_by.mention} <b>queued</b> at position {position}!",
+               reply_markup=keyboard,
         )
         os.remove("final.png")
-        
+        await asyncio.sleep(int(time_to_seconds(duration)))
+        await card.delete()
     else:
         que[chat_id] = []
         qeue = que.get(chat_id)
@@ -1291,10 +1299,11 @@ async def lol_cb(b, cb):
     
         await callsmusic.set_stream(chat_id, file_path)
         await cb.message.delete()
-        await b.send_photo(chat_id,
-            photo="final.png",
-            reply_markup=keyboard,
-            caption=f"▶️ <b>Playing</b> here the song requested by {r_by.mention} via Youtube Music 😎",
+        card = await b.send_photo(chat_id,
+               photo="final.png",
+               reply_markup=keyboard,
+               caption=f"▶️ <b>Playing</b> here the song requested by {r_by.mention} via Youtube Music 😎",
         )
-        
         os.remove("final.png")
+        await asyncio.sleep(int(time_to_seconds(duration)))
+        await card.delete()
